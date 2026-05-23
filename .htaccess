@@ -1,0 +1,80 @@
+# ============================================================
+#  Ouvidoria Escolar — .htaccess
+#  Apache 2.4+ | PHP 8.x
+# ============================================================
+
+# ── 1. Forçar HTTPS em produção ──────────────────────────────
+# Descomente apenas quando o certificado SSL estiver ativo no servidor.
+# Em localhost deixe comentado para não quebrar o desenvolvimento.
+#
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── 2. Desativar listagem de diretórios ───────────────────────
+# Impede que alguém acesse uma pasta sem index e veja todos os arquivos.
+Options -Indexes
+
+# ── 3. Bloquear acesso a arquivos sensíveis ───────────────────
+<FilesMatch "^\.env|\.gitignore|composer\.(json|lock)|package(-lock)?\.json|README\.md$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ── 4. Bloquear acesso direto à pasta db/ ────────────────────
+# migration.sql e gerar_hash.php não devem ser acessíveis pela web.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^db/.*$ - [F,L]
+</IfModule>
+
+# ── 5. Bloquear acesso direto à pasta uploads/ ───────────────
+# Arquivos são servidos apenas via código PHP, nunca diretamente.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^uploads/.*$ - [F,L]
+</IfModule>
+
+# ── 6. Headers de segurança HTTP ─────────────────────────────
+<IfModule mod_headers.c>
+    # Impede que o site seja embutido em iframes de outros domínios
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Impede que o browser "adivinhe" o tipo de arquivo
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Ativa proteção XSS em navegadores legados
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Controla quais recursos externos podem ser carregados
+    # Ajuste conforme os CDNs utilizados no projeto
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Remove o header que revela que o servidor usa Apache
+    Header always unset X-Powered-By
+    Header always unset Server
+</IfModule>
+
+# ── 7. Cache de assets estáticos ─────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css                  "access plus 1 month"
+    ExpiresByType application/javascript    "access plus 1 month"
+    ExpiresByType image/jpeg                "access plus 1 month"
+    ExpiresByType image/png                 "access plus 1 month"
+    ExpiresByType image/webp                "access plus 1 month"
+    ExpiresByType image/svg+xml             "access plus 1 month"
+    ExpiresByType image/x-icon              "access plus 1 year"
+    ExpiresByType font/woff2               "access plus 1 year"
+</IfModule>
+
+# ── 8. Compressão Gzip ────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript
+    AddOutputFilterByType DEFLATE application/json text/plain
+</IfModule>
+
+# ── 9. Página de erro personalizada ──────────────────────────
+# Crie essas páginas se quiser uma experiência melhor para erros
+# ErrorDocument 404 /ouvidoriaDW/404.html
+# ErrorDocument 500 /ouvidoriaDW/500.html
