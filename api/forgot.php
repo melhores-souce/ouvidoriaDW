@@ -10,23 +10,14 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/cors.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-// --- Só aceita POST ---
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método não permitido.']);
-    exit;
-}
+requireMethod('POST');
 
 // --- Lê e valida o body JSON ---
 $body = json_decode(file_get_contents('php://input'), true);
 $email = isset($body['email']) ? trim(strtolower($body['email'])) : '';
 
-if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(422);
-    echo json_encode(['error' => 'E-mail inválido.']);
-    exit;
+if (empty($email) || !isValidEmail($email)) {
+    jsonResponse(false, 'E-mail inválido.', [], 422);
 }
 
 // --- Mensagem genérica: não revela se o e-mail existe ou não ---
@@ -43,7 +34,7 @@ try {
 
     // Se não encontrou, retorna a mensagem genérica mesmo assim
     if (!$usuario) {
-        echo json_encode($resposta);
+        jsonResponse(true, $resposta['message']);
         exit;
     }
 
@@ -89,7 +80,7 @@ try {
     exit;
 }
 
-echo json_encode($resposta);
+jsonResponse(true, $resposta['message']);
 exit;
 
 

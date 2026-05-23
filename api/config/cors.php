@@ -82,35 +82,12 @@ function sanitize(mixed $value): string
     return htmlspecialchars(strip_tags(trim((string)$value)), ENT_QUOTES, 'UTF-8');
 }
 
-// ── Validações ────────────────────────────────────────────────
+// ── Validações ───────────────────────────────────────────────
 function isValidEmail(string $email): bool
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-function isValidCPF(string $cpf): bool
-{
-    $cpf = preg_replace('/\D/', '', $cpf);
-    if (strlen($cpf) !== 11 || preg_match('/^(\d)\1+$/', $cpf)) return false;
-    $sum = 0;
-    for ($i = 0; $i < 9; $i++) $sum += (int)$cpf[$i] * (10 - $i);
-    $r = 11 - ($sum % 11);
-    if ($r >= 10) $r = 0;
-    if ($r !== (int)$cpf[9]) return false;
-    $sum = 0;
-    for ($i = 0; $i < 10; $i++) $sum += (int)$cpf[$i] * (11 - $i);
-    $r = 11 - ($sum % 11);
-    if ($r >= 10) $r = 0;
-    return $r === (int)$cpf[10];
-}
-
-function isStrongPassword(string $pwd): bool
-{
-    return strlen($pwd) >= 8
-        && preg_match('/[A-Z]/', $pwd)
-        && preg_match('/\d/', $pwd)
-        && preg_match('/[^A-Za-z0-9]/', $pwd);
-}
 
 // ── Método HTTP obrigatório ───────────────────────────────────
 function requireMethod(string $method): void

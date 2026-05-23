@@ -450,16 +450,6 @@ const Auth = (() => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   }
 
-
-
-  function _maskPhone(v) {
-    return v.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2');
-  }
-  function _formatDate(s) {
-    if (!s) return '—';
-    const [y,m,d] = s.split('-');
-    return `${d}/${m}/${y}`;
-  }
   function _sanitize(str) {
     const d = document.createElement('div');
     d.textContent = str || '';

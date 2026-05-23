@@ -26,14 +26,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/cors.php';
 
-header('Content-Type: application/json; charset=UTF-8');
-
-/* ── 1. Só aceita POST ──────────────────────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
-    exit;
-}
+requireMethod('POST');
 
 /* ── 2. Tipos de arquivo permitidos (MIME real → extensão segura) ── */
 const TIPOS_PERMITIDOS = [

@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/config/db.php';   // garante que o .env é carregado antes do cors.php
 require_once __DIR__ . '/config/cors.php';
 
 // Mesma configuração do login.php e session.php

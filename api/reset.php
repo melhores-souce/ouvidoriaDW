@@ -10,13 +10,7 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/cors.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método não permitido.']);
-    exit;
-}
+requireMethod('POST');
 
 // --- Lê o body ---
 $body  = json_decode(file_get_contents('php://input'), true);
